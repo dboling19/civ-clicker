@@ -150,11 +150,14 @@ function updatePurchaseRow(purchaseObj) {
 	let havePrereqs = (purchaseObj.owned > 0)
 		|| civInterface.meetsUpgradePrereqs(purchaseObj.prereqs);
 
+	let isOwned = typeof purchaseObj.owned === 'boolean'
+		? purchaseObj.owned
+		: purchaseObj.owned === purchaseObj.limit;
 	// Special check: Hide one-shot upgrades after purchase; they're
 	// redisplayed elsewhere.
 	let hideBoughtUpgrade = (
 		(purchaseObj.type === "upgrade")
-		&& (purchaseObj.owned === purchaseObj.limit)
+		&& (isOwned)
 		&& !purchaseObj.salable
 	);
 
@@ -168,7 +171,7 @@ function updatePurchaseRow(purchaseObj) {
 		// Treat 'custom' or Infinity as +/-1.
 		// xxx Should we treat 'custom' as its appropriate value instead?
 		let absQty = abs(purchaseQty);
-		if ((absQty === "custom") || (absQty === Infinity)) {
+		if ((absQty === "custom") || (absQty === "Infinity")) {
 			purchaseQty = sgn(purchaseQty);
 		}
 		elt.disabled = ((purchaseQty > maxQty) || (purchaseQty < minQty));
@@ -439,7 +442,7 @@ function updateUpgrades(upgradeData) {
 	const civData = civInterface.getCivData();
 	const worshipOwned = civInterface.getWorshipOwned();
 	let domain = civInterface.getCurDeityDomain();
-	let hasDomain = Boolean(domain === "");
+	let hasDomain = Boolean(domain !== "");
 	let canSelectDomain = Boolean(worshipOwned && !hasDomain);
 
 	// Update all of the upgrades
